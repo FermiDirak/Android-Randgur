@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
     RelativeLayout imageHoldingLayout;
     ImageView imageHolder;
     Bitmap bitmap;
-    String link;
+    String link = "";
     ProgressDialog pDialog;
 
 
@@ -132,11 +132,11 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    private void setShareIntent(Intent shareIntent) {
-        if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(shareIntent);
-        }
-    }
+//    private void setShareIntent(Intent shareIntent) {
+//        if (mShareActionProvider != null) {
+//            mShareActionProvider.setShareIntent(shareIntent);
+//        }
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -156,7 +156,7 @@ public class MainActivity extends Activity {
 
     public void copyLinkToClipBoard() {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("image link", link);
+        ClipData clip = ClipData.newPlainText(link, link);
         clipboard.setPrimaryClip(clip);
 
         Toast.makeText(context, "Image link copied to clipboard.", Toast.LENGTH_LONG).show();
