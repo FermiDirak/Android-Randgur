@@ -43,9 +43,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startRelativeLayout.setVisibility(View.GONE);
-                link = "https://i.imgur.com/" + generatePossibleLink() + ".png";
                 new LoadImage().execute();
-                System.out.println(link);
                 imageHoldingLayout.setVisibility(View.VISIBLE);
             }
         });
@@ -77,6 +75,8 @@ public class MainActivity extends Activity {
         protected void onPostExecute(Bitmap image) {
             if(image != null){
                 imageHolder.setImageBitmap(image);
+                System.out.println(link);
+
                 pDialog.dismiss();
             }else{
                 pDialog.dismiss();
