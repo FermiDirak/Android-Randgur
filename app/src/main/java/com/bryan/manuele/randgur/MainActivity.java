@@ -1,9 +1,6 @@
 package com.bryan.manuele.randgur;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,38 +15,135 @@ import android.widget.ShareActionProvider;
 import android.widget.Toast;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends Activity {
-    private static Context context;
-    private ShareActionProvider mShareActionProvider;
-    RelativeLayout mainRelativeLayout;
     RelativeLayout startRelativeLayout;
-    RelativeLayout imageHoldingLayout;
-    ImageView imageHolder;
-    Bitmap bitmap;
-    String link = "";
+    RelativeLayout left;
+    RelativeLayout right;
     ProgressDialog pDialog;
+
+    ImageView imageView;
+
+    List<ImgurImage> images;
+    int slidePosition;
+
+    Boolean firstLoad;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        context = getApplicationContext();
-        mainRelativeLayout = (RelativeLayout) findViewById(R.id.mainRelativeLayout);
         startRelativeLayout = (RelativeLayout) findViewById(R.id.startRelativeLayout);
-        imageHoldingLayout = (RelativeLayout) findViewById(R.id.imageHoldingLayout);
-        imageHolder = (ImageView) findViewById(R.id.imageHolder);
+        left = (RelativeLayout) findViewById(R.id.left);
+        right = (RelativeLayout) findViewById(R.id.right);
+        imageView = (ImageView) findViewById(R.id.imageView);
 
-        mainRelativeLayout.setOnClickListener(new View.OnClickListener() {
+        images = new ArrayList<>();
+        slidePosition = -1;
+        firstLoad = true;
+
+        right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startRelativeLayout.setVisibility(View.GONE);
-                new LoadImage().execute();
-                imageHoldingLayout.setVisibility(View.VISIBLE);
+                if (firstLoad) {
+                    firstLoad();
+                    firstLoad = false;
+                } else {
+                    loadNextImage();
+                }
+            }
+        });
+
+        left.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (firstLoad) {
+                    firstLoad();
+                    firstLoad = false;
+                } else {
+                    loadPreviousImage();
+                }
             }
         });
     }
 
+    public void firstLoad() {
+        startRelativeLayout.setVisibility(View.GONE);
+
+        loadNextImage();
+    }
+
+    public void loadNextImage() {
+        if (slidePosition == images.size() - 1) {
+            new LoadImage().execute();
+        } else {
+            slidePosition++;
+            loadImageAtPosition();
+        }
+    }
+
+    public void loadPreviousImage() {
+        if (slidePosition != 0) {
+            slidePosition--;
+            loadImageAtPosition();
+        }
+    }
+
+    public void loadImageAtPosition() {
+        imageView.setImageBitmap(images.get(slidePosition).bitmap);
+    }
+
+    public final String generatePossibleLink() {
+        String result = "";
+        String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        for (int i = 0; i < 5; i++) {
+            int index = (int) (alphabet.length() * Math.random());
+            result += alphabet.charAt(index);
+        }
+        return  "https://i.imgur.com/" + result + ".png";
+    }
+
+    public void copyLinkToClipBoard() {
+//        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//        ClipData clip = ClipData.newPlainText(link, link);
+//        clipboard.setPrimaryClip(clip);
+//        Toast.makeText(getBaseContext(), "Image link copied to clipboard.", Toast.LENGTH_LONG).show();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        MenuItem item = menu.findItem(R.id.action_share);
+        ShareActionProvider mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+        Intent myIntent = new Intent();
+        myIntent.setAction(Intent.ACTION_SEND);
+        myIntent.putExtra(Intent.EXTRA_TEXT, "Whatever message you want to share");
+        myIntent.setType("text/plain");
+        mShareActionProvider.setShareIntent(myIntent);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.action_copy:
+                copyLinkToClipBoard();
+                return true;
+            case R.id.action_share:
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private class LoadImage extends AsyncTask<String, String, Bitmap> {
+        Bitmap bitmap;
+        String link = "";
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -74,8 +168,10 @@ public class MainActivity extends Activity {
 
         protected void onPostExecute(Bitmap image) {
             if(image != null){
-                imageHolder.setImageBitmap(image);
-                System.out.println(link);
+                ImgurImage imgurImage = new ImgurImage(link, bitmap);
+                images.add(imgurImage);
+                slidePosition++;
+                loadImageAtPosition();
 
                 pDialog.dismiss();
             }else{
@@ -84,47 +180,4 @@ public class MainActivity extends Activity {
             }
         }
     }
-
-    public final String generatePossibleLink() {
-        String result = "";
-        String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        for (int i = 0; i < 5; i++) {
-            int index = (int) (alphabet.length() * Math.random());
-            result += alphabet.charAt(index);
-        }
-        return  "https://i.imgur.com/" + result + ".png";
-    }
-
-    public void copyLinkToClipBoard() {
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText(link, link);
-        clipboard.setPrimaryClip(clip);
-        Toast.makeText(context, "Image link copied to clipboard.", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem item = menu.findItem(R.id.action_share);
-        mShareActionProvider = (ShareActionProvider) item.getActionProvider();
-        Intent myIntent = new Intent();
-        myIntent.setAction(Intent.ACTION_SEND);
-        myIntent.putExtra(Intent.EXTRA_TEXT, "Whatever message you want to share");
-        myIntent.setType("text/plain");
-        mShareActionProvider.setShareIntent(myIntent);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.action_copy:
-                copyLinkToClipBoard();
-                return true;
-            case R.id.action_share:
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
 }
