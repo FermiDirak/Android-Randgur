@@ -1,17 +1,19 @@
 package com.bryan.manuele.randgur;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.ShareActionProvider;
 import android.widget.Toast;
 import java.io.InputStream;
 import java.net.URL;
@@ -107,24 +109,19 @@ public class MainActivity extends Activity {
     }
 
     public void copyLinkToClipBoard() {
-//        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-//        ClipData clip = ClipData.newPlainText(link, link);
-//        clipboard.setPrimaryClip(clip);
-//        Toast.makeText(getBaseContext(), "Image link copied to clipboard.", Toast.LENGTH_LONG).show();
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText(images.get(slidePosition).link,
+                images.get(slidePosition).link);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(getBaseContext(), "Image link copied to clipboard.", Toast.LENGTH_LONG).show();
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
 
-        MenuItem item = menu.findItem(R.id.action_share);
-        ShareActionProvider mShareActionProvider = (ShareActionProvider) item.getActionProvider();
-        Intent myIntent = new Intent();
-        myIntent.setAction(Intent.ACTION_SEND);
-        myIntent.putExtra(Intent.EXTRA_TEXT, "Whatever message you want to share");
-        myIntent.setType("text/plain");
-        mShareActionProvider.setShareIntent(myIntent);
         return true;
     }
 
@@ -133,8 +130,6 @@ public class MainActivity extends Activity {
         switch(item.getItemId()) {
             case R.id.action_copy:
                 copyLinkToClipBoard();
-                return true;
-            case R.id.action_share:
                 return true;
         }
         return super.onOptionsItemSelected(item);
