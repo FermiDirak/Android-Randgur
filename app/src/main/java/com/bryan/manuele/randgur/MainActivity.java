@@ -143,6 +143,8 @@ public class MainActivity extends Activity {
             case R.id.action_share:
                 shareImage();
                 return true;
+            case R.id.action_download:
+                downloadImage();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -170,6 +172,18 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
 
+    }
+
+    public void downloadImage() {
+        try {
+            Bitmap bitmap = images.get(slidePosition).bitmap;
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File imageFile = new File(path, getCurrentTime() + ".png");
+            FileOutputStream fileOutPutStream = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 80, fileOutPutStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getCurrentTime() {
