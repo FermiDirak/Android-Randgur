@@ -2,11 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:randgur="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_copy"
-          android:title="CopyLink"
-          android:icon="@drawable/ic_action_copy"
-          android:orderInCategory="1"
-          randgur:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_copy"
+        android:icon="@drawable/ic_action_copy"
+        android:orderInCategory="1"
+        android:title="CopyLink"
+        randgur:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_action_share"
+        android:orderInCategory="2"
+        android:title="Share_Image"
+        randgur:showAsAction="ifRoom" />
 
 </menu>
