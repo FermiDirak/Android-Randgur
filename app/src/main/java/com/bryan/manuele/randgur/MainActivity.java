@@ -36,7 +36,6 @@ public class MainActivity extends Activity {
     ProgressDialog pDialog;
 
     ImageView imageView;
-
     List<ImgurImage> images;
     int slidePosition;
 
@@ -105,6 +104,7 @@ public class MainActivity extends Activity {
 
     public void loadImageAtPosition() {
         imageView.setImageBitmap(images.get(slidePosition).bitmap);
+
     }
 
     public final String generatePossibleLink() {
@@ -128,9 +128,8 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -145,6 +144,7 @@ public class MainActivity extends Activity {
                 return true;
             case R.id.action_download:
                 downloadImage();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -165,7 +165,7 @@ public class MainActivity extends Activity {
             shareIntent.setType("image/png");
             Uri uri = Uri.parse("file://" + imageFile.getAbsolutePath());
             shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Hello, This is test Sharing");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, images.get(slidePosition).link);
             startActivity(Intent.createChooser(shareIntent, "Send your image"));
 
         } catch (IOException e) {
@@ -176,6 +176,9 @@ public class MainActivity extends Activity {
 
     public void downloadImage() {
         try {
+
+            Toast.makeText(getBaseContext(), "Downloading Image...", Toast.LENGTH_LONG).show();
+
             Bitmap bitmap = images.get(slidePosition).bitmap;
             File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
             File imageFile = new File(path, getCurrentTime() + ".png");

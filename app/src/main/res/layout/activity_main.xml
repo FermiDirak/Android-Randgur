@@ -52,7 +52,7 @@
 
         <ImageView
             android:src="#05ffffff"
-            android:layout_width="5dp"
+            android:layout_width="3dp"
             android:layout_height="match_parent" />
 
         <RelativeLayout
@@ -70,7 +70,7 @@
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:contentDescription="@string/blank" />
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/blank"/>
 
 </RelativeLayout>
