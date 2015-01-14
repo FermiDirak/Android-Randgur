@@ -1,14 +1,12 @@
 package com.bryan.manuele.randgur;
+
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Menu;
@@ -19,11 +17,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -33,7 +31,6 @@ public class MainActivity extends Activity {
     RelativeLayout startRelativeLayout;
     RelativeLayout left;
     RelativeLayout right;
-    ProgressDialog pDialog;
 
     ImageView imageView;
     List<ImgurImage> images;
@@ -88,7 +85,7 @@ public class MainActivity extends Activity {
 
     public void loadNextImage() {
         if (slidePosition == images.size() - 1) {
-            new LoadImage().execute();
+            loadImage();
         } else {
             slidePosition++;
             loadImageAtPosition();
@@ -102,9 +99,9 @@ public class MainActivity extends Activity {
         }
     }
 
+    //TODO:Implement picasso fully, brah.
     public void loadImageAtPosition() {
-        imageView.setImageBitmap(images.get(slidePosition).bitmap);
-
+        Picasso.with(getBaseContext()).load(images.get(slidePosition).link).into(imageView);
     }
 
     public void copyLinkToClipBoard() {
@@ -190,44 +187,26 @@ public class MainActivity extends Activity {
                 calendar.get(Calendar.SECOND);
     }
 
-    private class LoadImage extends AsyncTask<String, String, Bitmap> {
-        Bitmap bitmap;
-        String link = "";
+    public void loadImage() {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(MainActivity.this);
-            pDialog.setMessage("Loading Image ....");
-            pDialog.show();
-        }
+        try {
+            Bitmap bitmap;
+            String link;
 
-        protected Bitmap doInBackground(String... args) {
-            try {
+            do {
+                link = ImgurImage.generatePossibleLink();
+                bitmap = Picasso.with(getBaseContext()).load(link).get();
+            } while (bitmap.getHeight() <= 81);
 
-                do { link = ImgurImage.generatePossibleLink();
-                    bitmap = BitmapFactory.decodeStream((InputStream)new URL(
-                            link).getContent()); }
-                while (bitmap.getHeight() <= 81);
+            ImgurImage imgurImage = new ImgurImage(link, bitmap);
+            images.add(imgurImage);
+            slidePosition++;
+            loadImageAtPosition();
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return bitmap;
-        }
+        } catch (Exception e) {
+            //TODO: No internet connection...
+            Toast.makeText(MainActivity.this, "Network Error", Toast.LENGTH_SHORT).show();
 
-        protected void onPostExecute(Bitmap image) {
-            if(image != null){
-                ImgurImage imgurImage = new ImgurImage(link, bitmap);
-                images.add(imgurImage);
-                slidePosition++;
-                loadImageAtPosition();
-
-                pDialog.dismiss();
-            }else{
-                pDialog.dismiss();
-                Toast.makeText(MainActivity.this, "Image Does Not exist or Network Error", Toast.LENGTH_SHORT).show();
-            }
         }
     }
 }
