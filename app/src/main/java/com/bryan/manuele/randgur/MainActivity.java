@@ -107,16 +107,6 @@ public class MainActivity extends Activity {
 
     }
 
-    public final String generatePossibleLink() {
-        String result = "";
-        String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        for (int i = 0; i < 5; i++) {
-            int index = (int) (alphabet.length() * Math.random());
-            result += alphabet.charAt(index);
-        }
-        return  "https://i.imgur.com/" + result + ".png";
-    }
-
     public void copyLinkToClipBoard() {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(images.get(slidePosition).link,
@@ -215,7 +205,7 @@ public class MainActivity extends Activity {
         protected Bitmap doInBackground(String... args) {
             try {
 
-                do { link = generatePossibleLink();
+                do { link = ImgurImage.generatePossibleLink();
                     bitmap = BitmapFactory.decodeStream((InputStream)new URL(
                             link).getContent()); }
                 while (bitmap.getHeight() <= 81);
