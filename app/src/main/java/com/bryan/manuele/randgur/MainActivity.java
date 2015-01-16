@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
     RelativeLayout right;
 
     ImageView imageView;
+
     List<ImgurImage> images;
     int slidePosition;
 
