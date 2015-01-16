@@ -109,7 +109,7 @@ public class MainActivity extends Activity {
         ClipData clip = ClipData.newPlainText(images.get(slidePosition).link,
                 images.get(slidePosition).link);
         clipboard.setPrimaryClip(clip);
-        Toast.makeText(getBaseContext(), "Image link copied to clipboard.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Image link copied to clipboard", Toast.LENGTH_LONG).show();
     }
 
 
